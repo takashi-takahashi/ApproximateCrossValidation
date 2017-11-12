@@ -17,6 +17,7 @@ def prob_logit(x):
             raise ValueError("unexpected shape of input vector\nexpected:" + str(1) + ", actual: " + str(len(x.shape)))
     except ValueError as e:
         print(e)
+        print()
         raise
     except Exception as e:
         print(e)
