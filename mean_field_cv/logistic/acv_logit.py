@@ -24,6 +24,7 @@ def acv_logit(w, X, Ycode):
 
     Note:
         In this method, expected shape is different from the MATLAB implementation.
+        (MATLAB -> w is a (N,1) matrix, Python -> w is (1,N)-shape np.float64 array)
     """
     try:
         # check length of shape
