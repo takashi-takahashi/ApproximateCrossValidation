@@ -6,7 +6,7 @@ from numpy.testing import assert_almost_equal, assert_array_almost_equal_nulp, a
 
 
 class TestProbLogit(unittest.TestCase):
-    def test_normal_case(self):
+    def test_calculation(self):
         """ test calculation accuracy """
         x = np.linspace(1, 10, 10)
         input_vector = -1.0 * np.log(
