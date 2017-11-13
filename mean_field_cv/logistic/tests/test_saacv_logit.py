@@ -31,7 +31,7 @@ class TestSaacvLogit(unittest.TestCase):
 
         desired = [0.218416659657244, 0.022009203762060]  # MATLAB result
         actual = saacv_logit(w=wV, X=X, Ycode=Ycode)
-        assert_allclose(actual=actual, desired=desired, rtol=1e-4)
+        assert_allclose(actual=actual, desired=desired, rtol=1e-3)
 
     def test_shape_length_check(self):
         """ test shape length checker"""
