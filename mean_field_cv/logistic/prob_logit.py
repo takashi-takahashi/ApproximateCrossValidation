@@ -19,9 +19,6 @@ def prob_logit(x):
         print(e)
         print()
         raise
-    except Exception as e:
-        print(e)
-        traceback.print_exc()
 
     x = 1.0 * np.exp(-x)
 
