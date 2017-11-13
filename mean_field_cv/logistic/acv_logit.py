@@ -27,6 +27,21 @@ def acv_logit(w, X, Ycode):
         (MATLAB -> w is a (N,1) matrix, Python -> w is (1,N)-shape np.float64 array)
     """
     try:
+
+        # type check
+        if type(w) is not np.ndarray:
+            msg = "unexpected type of weight vector\n" \
+                  "expected: numpy.ndarray, actual: " + str(type(w))
+            raise ValueError(msg)
+        elif type(X) is not np.ndarray:
+            msg = "unexpected type of input feature matrix\n" \
+                  "expected: numpy.ndarray, actual: " + str(type(X))
+            raise ValueError(msg)
+        elif type(Ycode) is not np.ndarray:
+            msg = "unexpected type of claass representative matrix\n" \
+                  "expected: numpy.ndarray, actual: " + str(type(Ycode))
+            raise ValueError(msg)
+
         # check length of shape
         if len(w.shape) <= 1 or 3 <= len(w.shape):
             raise ValueError("unexpected length of shape of weight vector\n expected: 2, actual: " + str(len(w.shape)))

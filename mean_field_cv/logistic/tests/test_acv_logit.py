@@ -34,6 +34,20 @@ class TestAcvLogit(unittest.TestCase):
 
         assert_allclose(actual, expected, rtol=1e-3)
 
+    def test_type_checker(self):
+        """ test type checker """
+        # make ideal dummy data
+        N = 10
+        M = 20
+        w = np.random.rand(1, N)
+        X = np.random.rand(M, N)
+        Ycode = np.random.binomial(1, 0.5, (N, 1))
+        Ycode = np.concatenate((Ycode, np.mod(Ycode - 1, 2)), axis=1)
+
+        self.assertRaises(ValueError, acv_logit, 1.0, X, Ycode)
+        self.assertRaises(ValueError, acv_logit, w, 1.0, Ycode)
+        self.assertRaises(ValueError, acv_logit, w, X, 1.0)
+
     def test_shape_length_check(self):
         """ test shape length checker"""
 
