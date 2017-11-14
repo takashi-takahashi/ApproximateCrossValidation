@@ -3,6 +3,7 @@ import numpy as np
 import math
 
 from mean_field_cv.logistic.prob_multinomial import prob_multinomial
+from mean_field_cv.logistic.utils.debug_util import show_me
 
 
 def saacv_mlr(wV, X, Ycode, Np=None):
@@ -96,6 +97,8 @@ def saacv_mlr(wV, X, Ycode, Np=None):
 
     # Active set
     A = (wV != 0)
+    # show_me(A, locals(), 0)
+    # print(N)
     activated_positions = np.einsum('ka,kb->kab', A, A)
 
     # SA Approximation of LOO factor C
@@ -117,17 +120,29 @@ def saacv_mlr(wV, X, Ycode, Np=None):
         C_SA = mean_X_square * np.sum(chi, axis=0)
 
         R = np.sum(np.linalg.solve(stack_I + F.dot(C_SA), F), axis=0)
+
         # Update chi
         for index in range(N):
             sub_vector = R[activated_positions[index]]
-            length = int(math.sqrt(len(sub_vector)))
-            sub_matrix = sub_vector.reshape(length, length)
-            [D, V] = np.linalg.eigh(sub_matrix)
-            A_rel = D > 1e-8
-            Rinv_zmr = V[:, A_rel].dot(np.linalg.inv(np.diag(D[A_rel]))).dot(V[:, A_rel].transpose())
-            # Rinv_zmr = V[:, A_rel].dot(np.linalg.solve(np.diag(D[A_rel]), V[:, A_rel].transpose()))
-            chi[index][activated_positions[index]] = gamma * chi_pre[index][activated_positions[index]] + \
-                                                     (1.0 - gamma) / mean_X_square * Rinv_zmr.reshape(length * length, )
+            if len(sub_vector):
+                length = int(math.sqrt(len(sub_vector)))
+                sub_matrix = sub_vector.reshape(length, length)
+                [D, V] = np.linalg.eigh(sub_matrix)
+                A_rel = D > 1e-8
+                Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
+                chi[index][activated_positions[index]] = \
+                    gamma * chi_pre[index][activated_positions[index]] + \
+                    (1.0 - gamma) / mean_X_square * Rinv_zmr.reshape(length * length, )
+
+            # position = np.ix_(A[index], A[index])
+            # sub_matrix = R[position]
+            # if sub_matrix.shape[0] > 0:
+            #     [D, V] = np.linalg.eigh(sub_matrix)
+            #     A_rel = D > 1e-8
+            #     Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
+            #     chi[index][position] = gamma * chi_pre[index][position] + \
+            #                            (1.0 - gamma) / mean_X_square * Rinv_zmr
+
         ERR = np.sum(np.linalg.norm(chi_pre - chi, ord='fro', axis=(1, 2))) / N
 
     # gradient
