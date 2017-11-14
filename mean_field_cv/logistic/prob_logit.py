@@ -1,10 +1,9 @@
 # coding=utf-8
 import numpy as np
-import traceback
 
 
 def prob_logit(x):
-    """calc logit probability from weight vector x
+    """calc logistic probability from weight vector x
 
     Args:
         x: M dimensional vector ((M,)-shape np.float64 object)
