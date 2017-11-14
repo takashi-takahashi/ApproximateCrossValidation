@@ -1,8 +1,9 @@
 # coding=utf-8
 import numpy as np
-import time
 from mean_field_cv.logistic.prob_multinomial import prob_multinomial
 
+
+# TODO: make this code faster
 
 def acv_mlr(wV, X, Ycode, Np=None):
     """ An approximate leave-one-out estimator of predictive likelihood
@@ -88,9 +89,6 @@ def acv_mlr(wV, X, Ycode, Np=None):
     # Parameter
     M, N = X.shape
     Nparam = N * Np
-    # show_me(X, locals(), 3)
-
-    t1 = time.time()
 
     # Preparation
     u_all = X.dot(wV)
@@ -102,8 +100,6 @@ def acv_mlr(wV, X, Ycode, Np=None):
         F_all[i_p] = {}
         for j_p in range(Np):
             F_all[i_p][j_p] = ((i_p == j_p) * p_all[:, i_p] - p_all[:, i_p] * p_all[:, j_p]).reshape(M, 1)
-
-    aho = F_all[0][0]
 
     # active set
     A = np.arange(len(W))[(W != 0)]  # position of active components
@@ -141,8 +137,6 @@ def acv_mlr(wV, X, Ycode, Np=None):
 
     # inverse hessian with zero mode removal
     [D, V] = np.linalg.eig(G)
-    # D,V = linalg.eig(G)
-    # D = np.diag(D)
     threshold = 1e-8
     A_rel = D > threshold
     Ginv_zmr = V[:, A_rel].dot(np.linalg.inv(np.diag(D[A_rel]))).dot(V[:, A_rel].transpose())
@@ -164,7 +158,6 @@ def acv_mlr(wV, X, Ycode, Np=None):
             ).dot(
                 X[mu, As_ipt[ip]]
             )
-
 
     # gradient
     b_all = np.zeros((Np, M))
