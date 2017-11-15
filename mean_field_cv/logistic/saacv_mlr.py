@@ -3,7 +3,6 @@ import numpy as np
 import math
 
 from mean_field_cv.logistic.prob_multinomial import prob_multinomial
-from mean_field_cv.logistic.utils.debug_util import show_me
 
 
 def saacv_mlr(wV, X, Ycode, Np=None):
