@@ -1,9 +1,9 @@
 # coding=utf-8
 import numpy as np
+import time
+
 from mean_field_cv.logistic.prob_multinomial import prob_multinomial
 
-
-# TODO: make this code faster
 
 def acv_mlr(wV, X, Ycode, Np=None):
     """ An approximate leave-one-out estimator of predictive likelihood
@@ -104,7 +104,7 @@ def acv_mlr(wV, X, Ycode, Np=None):
     # active set
     A = np.arange(len(W))[(W != 0)]  # position of active components
     A_ipt = np.mod(A, N)  # original column position
-    A_cla = np.floor(A / N)  # original class index
+    A_cla = np.floor(A / N).astype(dtype=np.int64)  # original class index
     ORDER = np.arange(len(A))
 
     As_ord = {}
@@ -113,8 +113,8 @@ def acv_mlr(wV, X, Ycode, Np=None):
         As_ord[ip] = ORDER[A_cla == ip]
         As_ipt[ip] = A_ipt[A_cla == ip]
 
-        ord = As_ord[ip]
-        ipt = As_ipt[ip]
+        # ord = As_ord[ip]
+        # ipt = As_ipt[ip]
 
     # # construct hessian
     # H = np.zeros((Nparam, Nparam))
@@ -130,19 +130,55 @@ def acv_mlr(wV, X, Ycode, Np=None):
     # t2 = time.time()
     # print("time2: ", t2 - t1, "sec")
 
-    X_expand = np.concatenate([X[:, A_ipt[A_cla == p]] for p in range(Np)], axis=1)
-    F_expand = np.array([F_all[A_cla[k]][A_cla[l]] for k in range(len(A)) for l in range(len(A))]).reshape(len(A),
-                                                                                                           len(A), M)
+    X_expand = __expand_X(A_cla, A_ipt, Np, X)
+
+    F_expand = __calculate_F(A, A_cla, F_all, M)
     G = np.einsum('mk,ml,klm->kl', X_expand, X_expand, F_expand)
 
     # inverse hessian with zero mode removal
-    [D, V] = np.linalg.eig(G)
+    [D, V] = np.linalg.eigh(G)
     threshold = 1e-8
     A_rel = D > threshold
+
     Ginv_zmr = V[:, A_rel].dot(np.linalg.inv(np.diag(D[A_rel]))).dot(V[:, A_rel].transpose())
 
     # LOO factor
+    C = __calculate_C(As_ipt, As_ord, Ginv_zmr, M, Np, X)
+
+    # gradient
+    b_all = np.zeros((Np, M))
+    for ip in range(Np):
+        b_all[ip, :] = p_all[:, ip].transpose() - Ycode[:, ip].transpose()
+
+    # LOOE
+    F = np.zeros((Np, Np, M))
+    I = np.eye(Np)
+    for ip in range(Np):
+        for jp in range(Np):
+            F[ip, jp, :] = F_all[ip][jp].reshape(M, )
+
+    u_all_loo = np.zeros((M, Np))
+    for mu in range(M):
+        temp = np.linalg.solve((I - F[:, :, mu].dot(C[:, :, mu])), b_all[:, mu])
+        u_all_loo[mu, :] = u_all[mu, :] + (C[:, :, mu].dot(temp)).transpose()
+
+    p_all_loo = prob_multinomial(u_all_loo)
+
+    LOOE = -1.0 * np.mean(np.log(np.sum(Ycode * p_all_loo, axis=1)))
+    ERR = np.std(np.log(np.sum(Ycode * p_all_loo, axis=1))) / np.sqrt(M - 1)
+
+    return LOOE, ERR
+
+
+def __expand_X(A_cla, A_ipt, Np, X):
+    X_expand = np.concatenate([X[:, A_ipt[A_cla == p]] for p in range(Np)], axis=1)
+    return X_expand
+
+
+def __calculate_C(As_ipt, As_ord, Ginv_zmr, M, Np, X):
+    """ calc C """
     C = np.zeros((Np, Np, M))
+
     for mu in range(M):
         for ip in range(Np):
             for jp in range(ip + 1, Np):
@@ -159,26 +195,11 @@ def acv_mlr(wV, X, Ycode, Np=None):
                 X[mu, As_ipt[ip]]
             )
 
-    # gradient
-    b_all = np.zeros((Np, M))
-    for ip in range(Np):
-        b_all[ip, :] = p_all[:, ip].transpose() - Ycode[:, ip].transpose()
+    return C
 
-    # LOOE
-    F = np.zeros((Np, Np, M))
-    I = np.eye(Np)
-    for ip in range(Np):
-        for jp in range(Np):
-            F[ip, jp, :] = F_all[ip][jp].reshape(960, )
 
-    u_all_loo = np.zeros((M, Np))
-    for mu in range(M):
-        temp = np.linalg.solve((I - F[:, :, mu].dot(C[:, :, mu])), b_all[:, mu])
-        u_all_loo[mu, :] = u_all[mu, :] + (C[:, :, mu].dot(temp)).transpose()
-
-    p_all_loo = prob_multinomial(u_all_loo)
-
-    LOOE = -1.0 * np.mean(np.log(np.sum(Ycode * p_all_loo, axis=1)))
-    ERR = np.std(np.log(np.sum(Ycode * p_all_loo, axis=1))) / np.sqrt(M - 1)
-
-    return LOOE, ERR
+def __calculate_F(A, A_cla, F_all, M):
+    """ calculate F """
+    F_expand = np.array([F_all[A_cla[k]][A_cla[l]] for k in range(len(A)) for l in range(len(A))]).reshape(len(A),
+                                                                                                           len(A), M)
+    return F_expand
