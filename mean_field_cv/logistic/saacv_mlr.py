@@ -102,8 +102,6 @@ def saacv_mlr(wV, X, Ycode, Np=None):
 
     # Active set
     A = (wV != 0)
-    # show_me(A, locals(), 0)
-    # print(N)
     activated_positions = np.einsum('ka,kb->kab', A, A)
 
     # SA Approximation of LOO factor C
