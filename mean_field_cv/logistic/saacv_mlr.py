@@ -135,7 +135,9 @@ def saacv_mlr(wV, X, Ycode, Np=None):
                 sub_matrix = sub_vector.reshape(length, length)
                 [D, V] = np.linalg.eigh(sub_matrix)
                 A_rel = D > 1e-8
-                Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
+
+                Rinv_zmr = V[:, A_rel].dot(np.linalg.inv(np.diag(D[A_rel])), V[:, A_rel].transpose())
+
                 chi[index][activated_positions[index]] = \
                     gamma * chi_pre[index][activated_positions[index]] + \
                     (1.0 - gamma) / mean_X_square * Rinv_zmr.reshape(length * length, )
