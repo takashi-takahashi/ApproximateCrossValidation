@@ -16,17 +16,23 @@ def saacv_mlr(wV, X, Ycode, Np=None):
     of predictive likelihood for multinomial logistic regression
     penalized by l1 norm.
 
+
     Args:
-        wV:
-        X:
-        Ycode:
-        Np:
+        wV: weight vectors (p, N)-shape np.float64 array
+        X: input feature matrix (M, N)-shape np.float64 array
+        Ycode: class representative matrix (M, p)-shape np.int64 array
+        Np: number of classes
 
     Returns:
         LOOE, ERR (float, float)
 
     References:
         [1]: T. Obuchi and Y. Kabashima, XXXXXXXXXXXX
+
+    Note:
+        In this method, expected shape is different from the MATLAB implementation.
+        (MATLAB -> w is a (N, p) matrix, Python -> w is (p, N)-shape np.float64 array)
+        (This is due to sklearn package output form.)
     """
     try:
         # type check
@@ -134,14 +140,14 @@ def saacv_mlr(wV, X, Ycode, Np=None):
                     gamma * chi_pre[index][activated_positions[index]] + \
                     (1.0 - gamma) / mean_X_square * Rinv_zmr.reshape(length * length, )
 
-            # position = np.ix_(A[index], A[index])
-            # sub_matrix = R[position]
-            # if sub_matrix.shape[0] > 0:
-            #     [D, V] = np.linalg.eigh(sub_matrix)
-            #     A_rel = D > 1e-8
-            #     Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
-            #     chi[index][position] = gamma * chi_pre[index][position] + \
-            #                            (1.0 - gamma) / mean_X_square * Rinv_zmr
+                # position = np.ix_(A[index], A[index])
+                # sub_matrix = R[position]
+                # if sub_matrix.shape[0] > 0:
+                #     [D, V] = np.linalg.eigh(sub_matrix)
+                #     A_rel = D > 1e-8
+                #     Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
+                #     chi[index][position] = gamma * chi_pre[index][position] + \
+                #                            (1.0 - gamma) / mean_X_square * Rinv_zmr
 
         ERR = np.sum(np.linalg.norm(chi_pre - chi, ord='fro', axis=(1, 2))) / N
 
