@@ -200,6 +200,6 @@ def __calculate_C(As_ipt, As_ord, Ginv_zmr, M, Np, X):
 
 def __calculate_F(A, A_cla, F_all, M):
     """ calculate F """
-    F_expand = np.array([F_all[A_cla[k]][A_cla[l]] for k in range(len(A)) for l in range(len(A))]).reshape(len(A),
-                                                                                                           len(A), M)
+    F_expand = np.array([F_all[A_cla[k]][A_cla[l]] for k in range(len(A)) for l in range(len(A))],
+                        dtype=np.float32).reshape(len(A), len(A), M)
     return F_expand
