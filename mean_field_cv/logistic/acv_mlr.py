@@ -175,7 +175,7 @@ def __calculate_C(As_ipt, As_ord, Ginv_zmr, M, Np, X):
             C[ip, ip, mu] = X[mu, As_ipt[ip]].dot(
                 Ginv_zmr[As_ord[ip], :][:, As_ord[ip]]
             ).dot(
-                X[mu, As_ipt[ip]]
+                X[mu, As_ipt[ip]].transpose()
             )
 
     return C
