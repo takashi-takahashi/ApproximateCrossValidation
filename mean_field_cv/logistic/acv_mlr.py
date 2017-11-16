@@ -113,23 +113,6 @@ def acv_mlr(wV, X, Ycode, Np=None):
         As_ord[ip] = ORDER[A_cla == ip]
         As_ipt[ip] = A_ipt[A_cla == ip]
 
-        # ord = As_ord[ip]
-        # ipt = As_ipt[ip]
-
-    # # construct hessian
-    # H = np.zeros((Nparam, Nparam))
-    # H_diag = np.zeros(Nparam)
-    # for i in range(len(A)):
-    #     H_diag[A[i]] = np.einsum('k,kl,k', X[:, A_ipt[i]], F_all[A_cla[i]][A_cla[i]], X[:, A_ipt[i]])
-    #     for j in range(i + 1, len(A)):
-    #         H[A[i]][A[j]] = np.einsum('k,kl,k', X[:, A_ipt[i]], F_all[A_cla[i]][A_cla[j]], X[:, A_ipt[j]])
-    # show_me(H_diag, locals(), 40)
-    # G = np.diag(H_diag) + H + H.transpose()
-    # show_me(G, locals(), 5)
-    #
-    # t2 = time.time()
-    # print("time2: ", t2 - t1, "sec")
-
     X_expand = __expand_X(A_cla, A_ipt, Np, X)
 
     F_expand = __calculate_F(A, A_cla, F_all, M)
