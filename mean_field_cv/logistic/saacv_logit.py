@@ -97,7 +97,7 @@ def saacv_logit(w, X, Ycode):
     # initialization
     gamma = 0.5
     ERR = 100
-    chi = 1.0 / M  # FIXME: is this initialization work correctly?
+    chi = 1.0 / mean_X_square
     while 1e-8 < ERR:
         chi_pre = chi
         C_SA = sum_A * mean_X_square * chi
