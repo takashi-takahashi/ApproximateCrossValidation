@@ -114,9 +114,7 @@ def saacv_mlr(wV, X, Ycode, Np=None):
     for i in range(N):
         chi[i][activated_positions[i]] = 1.0 / mean_X_square
 
-    counter = 0
     while ERR > 1e-6:
-        counter += 1
         chi_pre = chi.copy()
 
         # Compute R
@@ -129,8 +127,7 @@ def saacv_mlr(wV, X, Ycode, Np=None):
             sub_vector = R[activated_positions[index]]
             if len(sub_vector):
                 length = int(math.sqrt(len(sub_vector)))
-                sub_matrix = sub_vector.reshape(length, length)
-                [D, V] = np.linalg.eigh(sub_matrix)
+                [D, V] = np.linalg.eigh(sub_vector.reshape(length, length))
                 A_rel = D > 1e-8
 
                 Rinv_zmr = np.einsum('ij,j,mj->im', V[:, A_rel], 1.0 / D[A_rel], V[:, A_rel])
