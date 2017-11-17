@@ -1,5 +1,6 @@
 # Approximate Cross Validation
-===
+[![GPL Licence](https://badges.frapsoft.com/os/gpl/gpl.svg?v=103)](https://opensource.org/licenses/GPL-2.0/)
+
 
 **hogehoge** is a Python module for approximate cross validation used in the fiels of machine learning. 
 
