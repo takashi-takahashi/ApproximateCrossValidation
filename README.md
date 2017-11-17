@@ -13,11 +13,6 @@
 * jupyter (for notebooks)
 
 ## Installation
-* pip (recommended)
-```bash
-pip install hogehoge
-```
-
 * from sourse
 ```bash
 git clone <<url>>
@@ -31,7 +26,7 @@ python setup.py install
 ```python
 from mean_field_cv.logistic.acv_logit import acv_logit
 from mean_field_cv.logistic.saacv_logit import saacv_logit
-
+# TODO: add learning with Scikit-learn
 LOOE_ACV, ERR_ACV = acv_logit(wV, X, Ycode)  #ACV
 LOOE_SAACV, ERR_SAACV = saacv_logit(wV, X, Ycode)  #SAACV
 ```
@@ -40,7 +35,7 @@ LOOE_SAACV, ERR_SAACV = saacv_logit(wV, X, Ycode)  #SAACV
 ```python
 from mean_field_cv.logistic.acv_mlr import acv_mlr
 from mean_field_cv.logistic.saacv_mlr import saacv_mlr
-
+# TODO: add learning with Scikit-learn
 LOOE_ACV, ERR_ACV = acv_mlr(wV, X, Ycode)  #ACV
 LOOE_SAACV, ERR_SAACV = saacv_mlr(wV, X, Ycode)  #SAACV
 ```
