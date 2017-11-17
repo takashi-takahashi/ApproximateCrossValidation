@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mfcv_test',
+    name='mean_field_cv',
     version='1.0.0a',
     description='alpha version of mean-field cross validation modules',
     url='https://github.com/takashi-takahashi/ApproximateCrossValidation',
