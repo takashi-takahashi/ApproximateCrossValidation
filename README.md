@@ -7,7 +7,7 @@
 ## Description
 
 **hogehoge** is ...
-$x = 1.0, \int_x^y$ 
+$$x = 1.0, \int_x^y$$
 
 
 ## Requirements
